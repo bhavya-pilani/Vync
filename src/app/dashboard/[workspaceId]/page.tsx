@@ -4,9 +4,9 @@ import {
   getWorkspaceFolders,
   getWorkSpaces,
 } from '@/actions/workspace'
-// import CreateForlders from '@/components/global/create-folders'
-// import CreateWorkspace from '@/components/global/create-workspace'
-// import Folders from '@/components/global/folders'
+import CreateForlders from '@/components/global/create-folders'
+import CreateWorkspace from '@/components/global/create-workspace'
+import Folders from '@/components/global/folders'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import {
   dehydrate,

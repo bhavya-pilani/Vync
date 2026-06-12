@@ -6,8 +6,8 @@ import { ClerkProvider } from '@clerk/nextjs'
 import './globals.css'
 import { ThemeProvider } from '@/components/theme'
 import ReactQueryProvider from '@/react-query'
-// import { ReduxProvider } from '@/redux/provider'
-// import { Toaster } from 'sonner'
+import { ReduxProvider } from '@/redux/provider'
+import { Toaster } from 'sonner'
 
 const manrope = DM_Sans({ subsets: ['latin'] })
 
@@ -30,12 +30,12 @@ export default function RootLayout({
             defaultTheme="dark"
             disableTransitionOnChange
           >
-            {/* <ReduxProvider> */}
+            <ReduxProvider>
               <ReactQueryProvider>
                 {children}
-                {/* <Toaster /> */}
+                <Toaster />
               </ReactQueryProvider>
-            {/* </ReduxProvider> */}
+            </ReduxProvider>
           </ThemeProvider>
     </ClerkProvider>
         </body>
