@@ -19,7 +19,7 @@ const LandingPageNavBar = (props: Props) => {
           height={40}
           style={{ width: "auto", height: "auto" }}
         />
-        Opal
+        Vync
       </div>
       <div className="hidden gap-x-10 items-center lg:flex">
         <Link
