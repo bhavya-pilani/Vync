@@ -7,7 +7,7 @@ type Props = {
 
 const Layout = ({ children }: Props) => {
   return (
-    <div className="felx felx-col py-10 px-10 xl:px-0 container">
+    <div className="flex flex-col py-10 px-10 xl:px-0 container mx-auto">
       <LandingPageNavBar />
       {children}
     </div>

@@ -4,9 +4,11 @@ import { NextRequest, NextResponse } from 'next/server'
 
 export async function GET(
   req: NextRequest,
-  { params: { id } }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
-  console.log('Enpoint hit ✅')
+  const { id } = await params
+
+  console.log('Endpoint hit ✅', id)
 
   try {
     const userProfile = await client.user.findUnique({
@@ -22,29 +24,44 @@ export async function GET(
         },
       },
     })
-    if (userProfile)
-      return NextResponse.json({ status: 200, user: userProfile })
-    const clerkUserInstance = await clerkClient.users.getUser(id)
+
+    if (userProfile) {
+      return NextResponse.json({
+        status: 200,
+        user: userProfile,
+      })
+    }
+
+    const clerk = await clerkClient()
+
+    const clerkUserInstance = await clerk.users.getUser(id)
+
     const createUser = await client.user.create({
       data: {
         clerkid: id,
         email: clerkUserInstance.emailAddresses[0].emailAddress,
         firstname: clerkUserInstance.firstName,
         lastname: clerkUserInstance.lastName,
+        image: clerkUserInstance.imageUrl,
+
         studio: {
           create: {},
         },
+
         workspace: {
           create: {
             name: `${clerkUserInstance.firstName}'s Workspace`,
             type: 'PERSONAL',
           },
         },
+
         subscription: {
           create: {},
         },
       },
+
       include: {
+        studio: true,
         subscription: {
           select: {
             plan: true,
@@ -53,10 +70,21 @@ export async function GET(
       },
     })
 
-    if (createUser) return NextResponse.json({ status: 201, user: createUser })
-
-    return NextResponse.json({ status: 400 })
+    return NextResponse.json({
+      status: 201,
+      user: createUser,
+    })
   } catch (error) {
-    console.log('ERROR', error)
+    console.error('ERROR:', error)
+
+    return NextResponse.json(
+      {
+        status: 500,
+        error: 'Internal Server Error',
+      },
+      {
+        status: 500,
+      }
+    )
   }
 }
