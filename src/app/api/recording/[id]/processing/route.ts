@@ -3,11 +3,18 @@ import { NextRequest, NextResponse } from 'next/server'
 
 export async function POST(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    // 🟢 1. SECURITY CHECK: Ensure request is coming from your Express Server
+    const authHeader = req.headers.get("Authorization");
+    if (authHeader !== `Bearer ${process.env.INTERNAL_SERVER_SECRET}`) {
+      console.error("🔴 Unauthorized attempt to access processing API");
+      return NextResponse.json({ error: "Unauthorized Service" }, { status: 401 });
+    }
+
     const body = await req.json()
-    const { id } = params
+    const { id } = await params
 
     const personalworkspaceId = await client.user.findUnique({
       where: {
@@ -27,9 +34,20 @@ export async function POST(
         },
       },
     })
+
+    if (!personalworkspaceId?.workspace?.length) {
+      return NextResponse.json(
+        {
+          status: 404,
+          message: 'Personal workspace not found',
+        },
+        { status: 404 }
+      )
+    }
+
     const startProcessingVideo = await client.workSpace.update({
       where: {
-        id: personalworkspaceId?.workspace[0].id,
+        id: personalworkspaceId.workspace[0].id,
       },
       data: {
         videos: {
@@ -52,14 +70,19 @@ export async function POST(
       },
     })
 
-    if (startProcessingVideo) {
-      return NextResponse.json({
-        status: 200,
-        plan: startProcessingVideo.User?.subscription?.plan,
-      })
-    }
-    return NextResponse.json({ status: 400 })
+    return NextResponse.json({
+      status: 200,
+      plan: startProcessingVideo.User?.subscription?.plan,
+    })
   } catch (error) {
     console.log('🔴 Error in processing video', error)
+
+    return NextResponse.json(
+      {
+        status: 500,
+        message: 'Internal Server Error',
+      },
+      { status: 500 }
+    )
   }
 }
