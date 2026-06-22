@@ -19,7 +19,6 @@ export async function POST(
 
     // 2. Parse incoming data from Express (Gemini AI output)
     const body = await req.json();
-    const { id } = params;
     const content = JSON.parse(body.content);
 
     // 3. Database Update
