@@ -8,6 +8,7 @@ import {
   ArrowRight,
   Video,
 } from "lucide-react";
+import Link from "next/link";
 
 export default function Home() {
   return (
@@ -41,10 +42,12 @@ export default function Home() {
             </p>
 
             <div className="flex flex-wrap gap-4 mt-10">
+              <Link href="/auth/sign-in">
               <button className="flex items-center gap-2 bg-purple-600 hover:bg-purple-700 transition-colors px-8 py-4 rounded-full font-medium shadow-lg shadow-purple-500/25">
                 Get Started Free
                 <ArrowRight className="w-5 h-5" />
               </button>
+              </Link>
 
               <button className="flex items-center gap-2 bg-transparent hover:bg-zinc-900 border border-zinc-800 transition-colors px-8 py-4 rounded-full font-medium">
                 <Play className="w-5 h-5" />
