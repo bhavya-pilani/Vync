@@ -6,6 +6,14 @@ import { sendEmail } from "./user";
 // import { createClient, OAuthStrategy } from '@wix/sdk'
 // import { items } from '@wix/data'
 import axios from "axios";
+import { v2 as cloudinary } from "cloudinary";
+
+// Configure Cloudinary
+cloudinary.config({
+  cloud_name: process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME,
+  api_key: process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET,
+});
 
 export const verifyAccessToWorkspace = async (workspaceId: string) => {
   try {
@@ -481,6 +489,123 @@ export const editVideoInfo = async (
 //     return { status: 400 }
 //   }
 // }
+
+export const deleteVideo = async (videoId: string) => {
+  try {
+    const user = await currentUser();
+    if (!user) return { status: 403, data: "Unauthorized" };
+
+    // Get the video with its source URL
+    const video = await client.video.findUnique({
+      where: {
+        id: videoId,
+      },
+      select: {
+        source: true,
+        User: {
+          select: {
+            clerkid: true,
+          },
+        },
+      },
+    });
+
+    if (!video) {
+      return { status: 404, data: "Video not found" };
+    }
+
+    if (video.User?.clerkid !== user.id) {
+      return {
+        status: 403,
+        data: "You don't have permission to delete this video",
+      };
+    }
+
+    // Delete from Cloudinary
+    if (video.source) {
+      try {
+        console.log(
+          "🔍 Attempting to delete from Cloudinary. URL:",
+          video.source,
+        );
+
+        // Extract public ID from Cloudinary URL
+        // URL format: https://res.cloudinary.com/{cloud_name}/video/upload/v{version}/{folder}/{public_id}.{ext}
+        let publicId: string | null = null;
+
+        try {
+          const url = new URL(video.source);
+          const pathname = url.pathname;
+
+          // Extract everything after /video/upload/
+          const uploadMatch = pathname.match(/\/video\/upload\/(.+)$/);
+          if (uploadMatch) {
+            let idPath = uploadMatch[1];
+
+            // Remove query parameters if any
+            idPath = idPath.split("?")[0];
+
+            // Skip version number if present (e.g., v1782387115/)
+            idPath = idPath.replace(/^v\d+\//, "");
+
+            // Remove ONLY the last extension (handle double extensions like .webm.webm)
+            // Keep everything including nested extensions, remove only the last one
+            publicId = idPath.replace(/\.[^.]+$/, "");
+
+            console.log("📝 Extracted public ID:", publicId);
+          }
+        } catch (e) {
+          console.log("⚠️ URL parsing failed:", e);
+        }
+
+        if (publicId) {
+          console.log(
+            "🗑️ Deleting video from Cloudinary with public ID:",
+            publicId,
+          );
+
+          // Delete from Cloudinary
+          const result = await cloudinary.api.delete_resources([publicId], {
+            resource_type: "video",
+          });
+
+          console.log("✅ Cloudinary deletion result:", result);
+
+          if (result.deleted[publicId] === "deleted") {
+            console.log("✨ Video successfully deleted from Cloudinary!");
+          } else {
+            console.warn(
+              "⚠️ Video not found in Cloudinary (may have been deleted already)",
+            );
+          }
+        } else {
+          console.warn(
+            "⚠️ Could not extract public ID from URL:",
+            video.source,
+          );
+        }
+      } catch (cloudinaryError) {
+        console.error("❌ Error deleting from Cloudinary:", cloudinaryError);
+        // Continue with database deletion even if Cloudinary deletion fails
+      }
+    }
+
+    // Delete from database
+    await client.video.delete({
+      where: {
+        id: videoId,
+      },
+    });
+
+    return {
+      status: 200,
+      data: "Video deleted successfully from database and Cloudinary",
+    };
+  } catch (error) {
+    console.error("Delete video error:", error);
+    return { status: 500, data: "Failed to delete video" };
+  }
+};
 
 export const howToPost = async () => {
   try {

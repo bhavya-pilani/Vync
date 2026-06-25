@@ -24,6 +24,7 @@ type Props = {
   source: string;
   processing: boolean;
   workspaceId: string;
+  videosKey?: string;
 };
 
 const VideoCard = (props: Props) => {
@@ -45,7 +46,7 @@ const VideoCard = (props: Props) => {
   // 🟢 4. Now it is safe to calculate the time purely on the client!
   const createdAt = new Date(props.createdAt);
   const daysAgo = Math.floor(
-    (Date.now() - createdAt.getTime()) / (24 * 60 * 60 * 1000)
+    (Date.now() - createdAt.getTime()) / (24 * 60 * 60 * 1000),
   );
 
   return (
@@ -60,6 +61,7 @@ const VideoCard = (props: Props) => {
             videoId={props.id}
             currentWorkspace={props.workspaceId}
             currentFolder={props.Folder?.id}
+            videosKey={props.videosKey}
           />
           <CopyLink
             className="p-[5px] h-5 bg-hover:bg-transparent bg-[#252525]"

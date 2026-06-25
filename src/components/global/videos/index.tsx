@@ -51,7 +51,12 @@ const Videos = ({ folderId, videosKey, workspaceId }: Props) => {
       >
         {videosStatus === 200 ? (
           videos.map((video) => (
-            <VideoCard key={video.id} workspaceId={workspaceId} {...video} />
+            <VideoCard
+              key={video.id}
+              workspaceId={workspaceId}
+              videosKey={videosKey}
+              {...video}
+            />
           ))
         ) : (
           <p className="text-[#BDBDBD]"> No videos in workspace</p>
