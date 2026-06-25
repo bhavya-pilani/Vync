@@ -49,12 +49,12 @@ const Page = async ({ params }: Props) => {
               >
                 Videos
               </TabsTrigger>
-              <TabsTrigger
+              {/* <TabsTrigger
                 value="archive"
                 className="p-[13px] px-6 rounded-full data-[state=active]:bg-[#252525]"
               >
                 Archive
-              </TabsTrigger>
+              </TabsTrigger> */}
             </TabsList>
             <div className="flex gap-x-3">
               <CreateWorkspace />
