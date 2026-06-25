@@ -396,6 +396,20 @@ export const inviteMembers = async (
             },
           },
         });
+
+        await client.user.update({
+          where: {
+            id: recieverId,
+          },
+          data: {
+            notification: {
+              create: {
+                content: `${senderName} invited you to ${workspace.name}`,
+              },
+            },
+          },
+        });
+
         if (invitation) {
           const { transporter, mailOptions } = await sendEmail(
             email,
