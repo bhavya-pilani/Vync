@@ -454,14 +454,24 @@ export const acceptInvite = async (inviteId: string) => {
         workSpaceId: true,
         reciever: {
           select: {
+            id: true,
             clerkid: true,
           },
         },
       },
     });
 
-    if (user.id !== invitation?.reciever?.clerkid) return { status: 401 };
-    const acceptInvite = client.invite.update({
+    if (!invitation?.reciever) return { status: 404 };
+    if (user.id !== invitation.reciever.clerkid) return { status: 401 };
+
+    const memberExists = await client.member.findFirst({
+      where: {
+        userId: invitation.reciever.id,
+        workSpaceId: invitation.workSpaceId,
+      },
+    });
+
+    const inviteUpdate = client.invite.update({
       where: {
         id: inviteId,
       },
@@ -470,23 +480,29 @@ export const acceptInvite = async (inviteId: string) => {
       },
     });
 
-    const updateMember = client.user.update({
-      where: {
-        clerkid: user.id,
-      },
-      data: {
-        members: {
-          create: {
-            workSpaceId: invitation.workSpaceId,
-          },
-        },
-      },
-    });
+    let membersTransaction;
 
-    const membersTransaction = await client.$transaction([
-      acceptInvite,
-      updateMember,
-    ]);
+    if (!memberExists) {
+      if (!invitation.workSpaceId) return { status: 400 };
+
+      membersTransaction = await client.$transaction([
+        inviteUpdate,
+        client.user.update({
+          where: {
+            clerkid: user.id,
+          },
+          data: {
+            members: {
+              create: {
+                workSpaceId: invitation.workSpaceId,
+              },
+            },
+          },
+        }),
+      ]);
+    } else {
+      membersTransaction = await client.$transaction([inviteUpdate]);
+    }
 
     if (membersTransaction) {
       return { status: 200 };
