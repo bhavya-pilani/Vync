@@ -111,7 +111,11 @@ export const getNotifications = async () => {
         clerkid: user.id,
       },
       select: {
-        notification: true,
+        notification: {
+          orderBy: {
+            createdAt: "desc",
+          },
+        },
         _count: {
           select: {
             notification: true,
@@ -372,6 +376,14 @@ export const inviteMembers = async (
           },
         });
 
+        const senderName = senderInfo.lastname
+          ? `${senderInfo.firstname} ${senderInfo.lastname}`
+          : senderInfo.firstname;
+        const receiverName =
+          [recieverUser?.firstname, recieverUser?.lastname]
+            .filter(Boolean)
+            .join(" ") || "a user";
+
         await client.user.update({
           where: {
             clerkid: user.id,
@@ -379,7 +391,7 @@ export const inviteMembers = async (
           data: {
             notification: {
               create: {
-                content: `${senderInfo.firstname} ${senderInfo.lastname} invited ${recieverUser?.firstname ?? "a user"} ${recieverUser?.lastname ?? ""} into ${workspace.name}`,
+                content: `${senderName} invited ${receiverName} into ${workspace.name}`,
               },
             },
           },
