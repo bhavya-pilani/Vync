@@ -405,6 +405,7 @@ export const inviteMembers = async (
             notification: {
               create: {
                 content: `${senderName} invited you to ${workspace.name}`,
+                link: `${process.env.NEXT_PUBLIC_HOST_URL}/invite/${invitation.id}`,
               },
             },
           },

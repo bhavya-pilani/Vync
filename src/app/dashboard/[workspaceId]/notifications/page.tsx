@@ -1,36 +1,37 @@
-'use client'
-import { getNotifications } from '@/actions/user'
-import { Avatar, AvatarFallback } from '@/components/ui/avatar'
-import { useQueryData } from '@/hooks/useQueryData'
-import { QueryClient } from '@tanstack/react-query'
-import { User } from 'lucide-react'
-import React from 'react'
+"use client";
+import { getNotifications } from "@/actions/user";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { useQueryData } from "@/hooks/useQueryData";
+import { QueryClient } from "@tanstack/react-query";
+import { User } from "lucide-react";
+import React from "react";
 
-type Props = {}
+type Props = {};
 
 const Notifications = (props: Props) => {
   const { data: notifications } = useQueryData(
-    ['user-notifications'],
-    getNotifications
-  )
+    ["user-notifications"],
+    getNotifications,
+  );
 
   const { data: notification, status } = notifications as {
-    status: number
+    status: number;
     data: {
       notification: {
-        id: string
-        userId: string | null
-        content: string
-      }[]
-    }
-  }
+        id: string;
+        userId: string | null;
+        content: string;
+        link?: string | null;
+      }[];
+    };
+  };
 
   if (status !== 200) {
     return (
       <div className="flex justify-center items-center h-full w-full">
         <p>No Notification</p>
       </div>
-    )
+    );
   }
 
   return (
@@ -45,11 +46,21 @@ const Notifications = (props: Props) => {
               <User />
             </AvatarFallback>
           </Avatar>
-          <p>{n.content}</p>
+          <div className="flex flex-col gap-2">
+            <p>{n.content}</p>
+            {n.link ? (
+              <a
+                href={n.link}
+                className="text-sm text-blue-400 hover:underline"
+              >
+                Join workspace
+              </a>
+            ) : null}
+          </div>
         </div>
       ))}
     </div>
-  )
-}
+  );
+};
 
-export default Notifications
+export default Notifications;
