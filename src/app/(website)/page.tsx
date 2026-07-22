@@ -95,7 +95,7 @@ export default function Home() {
                     fill="none"
                     stroke="currentColor"
                     strokeWidth="1.6"
-                    className="w-14 h-14 lg:w-20 lg:h-20 text-zinc-400"
+                    className="w-10 h-10 lg:w-12 lg:h-12 text-zinc-400"
                   >
                     {/* Head */}
                     <circle cx="12" cy="8" r="3.8" />
