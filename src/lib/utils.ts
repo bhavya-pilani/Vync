@@ -22,7 +22,7 @@ export type GitHubRelease = {
 export const downloadLatestDesktopApp = async () => {
   try {
     const res = await fetch(
-      "https://api.github.com/repos/bhavya-pilani/vynv-desktop/releases/latest",
+      "https://api.github.com/repos/bhavya-pilani/vync-desktop/releases/latest",
     );
 
     const release: GitHubRelease = await res.json();
