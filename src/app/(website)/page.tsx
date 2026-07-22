@@ -8,6 +8,7 @@ import {
   ArrowRight,
   Video,
 } from "lucide-react";
+import { CircleUserRound } from "lucide-react";
 import Link from "next/link";
 
 export default function Home() {
@@ -43,10 +44,10 @@ export default function Home() {
 
             <div className="flex flex-wrap gap-4 mt-10">
               <Link href="/auth/sign-in">
-              <button className="flex items-center gap-2 bg-purple-600 hover:bg-purple-700 transition-colors px-8 py-4 rounded-full font-medium shadow-lg shadow-purple-500/25">
-                Get Started Free
-                <ArrowRight className="w-5 h-5" />
-              </button>
+                <button className="flex items-center gap-2 bg-purple-600 hover:bg-purple-700 transition-colors px-8 py-4 rounded-full font-medium shadow-lg shadow-purple-500/25">
+                  Get Started Free
+                  <ArrowRight className="w-5 h-5" />
+                </button>
               </Link>
 
               <button className="flex items-center gap-2 bg-transparent hover:bg-zinc-900 border border-zinc-800 transition-colors px-8 py-4 rounded-full font-medium">
@@ -84,15 +85,31 @@ export default function Home() {
               />
 
               {/* Floating Webcam Overlay */}
-              <div className="absolute bottom-4 left-4 lg:bottom-6 lg:left-6 transition-transform hover:scale-105 cursor-pointer">
-                <div className="w-20 h-20 lg:w-28 lg:h-28 rounded-full border-4 border-purple-600 overflow-hidden shadow-2xl">
-                  <Image
-                    src="/webcamLand.png"
-                    alt="Webcam"
-                    width={112}
-                    height={112}
-                    className="w-full h-full object-cover"
-                  />
+              {/* Floating Webcam Overlay */}
+              <div className="absolute bottom-4 left-4 lg:bottom-6 lg:left-6 transition-transform hover:scale-105">
+                <div className="relative w-16 h-16 lg:w-20 lg:h-20 rounded-full border-4 border-purple-600 bg-zinc-900 shadow-2xl flex items-center justify-center">
+                  {/* Avatar Outline */}
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="1.6"
+                    className="w-14 h-14 lg:w-20 lg:h-20 text-zinc-400"
+                  >
+                    {/* Head */}
+                    <circle cx="12" cy="8" r="3.8" />
+
+                    {/* Shoulders */}
+                    <path
+                      d="M5 19c1.8-3 4.3-4.5 7-4.5s5.2 1.5 7 4.5"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    />
+                  </svg>
+
+                  {/* Green Status Dot */}
+                  <div className="absolute bottom-2 right-2 h-3.5 w-3.5 rounded-full bg-green-500 border-2 border-zinc-900"></div>
                 </div>
               </div>
             </div>
@@ -111,32 +128,36 @@ export default function Home() {
       </section>
 
       {/* Stats Section */}
+      {/* Stats Section */}
       <section className="border-y border-zinc-900 bg-zinc-950/50">
         <div className="max-w-7xl mx-auto px-6 py-16">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-8 text-center divide-x divide-zinc-900">
             <div>
               <h2 className="text-4xl lg:text-5xl font-bold bg-clip-text text-transparent bg-gradient-to-b from-white to-zinc-500">
-                10K+
+                1080<span className="text-violet-500">p</span>
               </h2>
-              <p className="text-zinc-500 mt-2 font-medium">Videos Recorded</p>
+              <p className="text-zinc-500 mt-2 font-medium">Resolution</p>
             </div>
+
             <div>
               <h2 className="text-4xl lg:text-5xl font-bold bg-clip-text text-transparent bg-gradient-to-b from-white to-zinc-500">
-                5K+
+                Zero
               </h2>
-              <p className="text-zinc-500 mt-2 font-medium">Active Users</p>
+              <p className="text-zinc-500 mt-2 font-medium">Watermarks</p>
             </div>
+
             <div>
               <h2 className="text-4xl lg:text-5xl font-bold bg-clip-text text-transparent bg-gradient-to-b from-white to-zinc-500">
-                500+
+                1-Click
               </h2>
-              <p className="text-zinc-500 mt-2 font-medium">Teams</p>
+              <p className="text-zinc-500 mt-2 font-medium">Instant Sharing</p>
             </div>
+
             <div>
               <h2 className="text-4xl lg:text-5xl font-bold bg-clip-text text-transparent bg-gradient-to-b from-white to-zinc-500">
-                99.9%
+                100%
               </h2>
-              <p className="text-zinc-500 mt-2 font-medium">Uptime SLA</p>
+              <p className="text-zinc-500 mt-2 font-medium">Cloud Hosted</p>
             </div>
           </div>
         </div>
@@ -275,36 +296,81 @@ export default function Home() {
       </section>
 
       {/* Footer */}
+      {/* Footer */}
       <footer id="contact" className="border-t border-zinc-900 bg-[#050505]">
-        <div className="max-w-7xl mx-auto px-6 py-12 flex flex-col md:flex-row justify-between items-center gap-6">
-          <div className="flex items-center gap-3">
-            <div className="w-8 h-8 bg-zinc-800 rounded-lg flex items-center justify-center">
-              <Video className="w-4 h-4 text-purple-500" />
+        <div className="max-w-7xl mx-auto px-6 py-12">
+          <div className="grid md:grid-cols-3 gap-10">
+            {/* Logo */}
+            <div>
+              <div className="flex items-center gap-3 mb-4">
+                <div className="w-8 h-8 bg-zinc-800 rounded-lg flex items-center justify-center">
+                  <Video className="w-4 h-4 text-purple-500" />
+                </div>
+                <h2 className="font-bold text-xl tracking-tight">Vync</h2>
+              </div>
+
+              <p className="text-zinc-400 leading-relaxed">
+                Record, share and collaborate with your team effortlessly using
+                AI-powered video communication.
+              </p>
             </div>
-            <h2 className="font-bold text-xl tracking-tight">Vync</h2>
+
+            {/* Quick Links */}
+            <div>
+              <h3 className="text-lg font-semibold mb-4">Quick Links</h3>
+
+              <div className="flex flex-col gap-3 text-zinc-400">
+                <a href="#" className="hover:text-white transition-colors">
+                  Home
+                </a>
+                <a
+                  href="#features"
+                  className="hover:text-white transition-colors"
+                >
+                  Features
+                </a>
+                <a
+                  href="#pricing"
+                  className="hover:text-white transition-colors"
+                >
+                  Pricing
+                </a>
+                <a
+                  href="#contact"
+                  className="hover:text-white transition-colors"
+                >
+                  Contact
+                </a>
+              </div>
+            </div>
+
+            {/* Contact */}
+            <div>
+              <h3 className="text-lg font-semibold mb-4">Contact Us</h3>
+
+              <div className="space-y-3 text-zinc-400">
+                <p>📞 +91 9885445845</p>
+                {/* <p>📞 +91 9865445545</p> */}
+                <p>✉️ support@vyncapp.com</p>
+                {/* <p>📍 123 Innovation Street, San Francisco, CA</p> */}
+              </div>
+            </div>
           </div>
 
-          <div className="flex flex-wrap justify-center gap-8 text-sm text-zinc-400">
-            <a href="#" className="hover:text-white transition-colors">
-              Home
-            </a>
-            <a href="#features" className="hover:text-white transition-colors">
-              Features
-            </a>
-            <a href="#pricing" className="hover:text-white transition-colors">
-              Pricing
-            </a>
-            <a href="#contact" className="hover:text-white transition-colors">
-              Contact
-            </a>
-            <a href="#" className="hover:text-white transition-colors">
-              Privacy Policy
-            </a>
-          </div>
+          <div className="mt-12 pt-6 border-t border-zinc-900 flex flex-col md:flex-row justify-between items-center gap-4">
+            <p className="text-sm text-zinc-500">
+              © {new Date().getFullYear()} Vync. All rights reserved.
+            </p>
 
-          <p className="text-sm text-zinc-600">
-            © {new Date().getFullYear()} Vync Inc. All rights reserved.
-          </p>
+            <div className="flex gap-6 text-sm text-zinc-500">
+              <a href="#" className="hover:text-white transition-colors">
+                Privacy Policy
+              </a>
+              <a href="#" className="hover:text-white transition-colors">
+                Terms of Service
+              </a>
+            </div>
+          </div>
         </div>
       </footer>
     </main>
