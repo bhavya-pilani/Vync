@@ -2,18 +2,18 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { usePathname } from "next/navigation"; // Changed to usePathname
-import { 
-  Sparkles, 
-  Video, 
-  FolderOpen, 
+import { usePathname, useParams } from "next/navigation"; // Changed to usePathname
+import {
+  Sparkles,
+  Video,
+  FolderOpen,
   ArrowRight,
   Share2,
   Bot,
   MonitorPlay,
   Users,
   LayoutGrid,
-  Activity
+  Activity,
 } from "lucide-react";
 import {
   Dialog,
@@ -25,20 +25,21 @@ import {
 import { Button } from "@/components/ui/button";
 import VideoRecorderIcon from "@/components/icons/video-recorder";
 import { downloadLatestDesktopApp } from "@/lib/utils";
+import WorkspaceMembersModal from "@/components/global/workspace-members-modal";
 
 const Home = () => {
   const [open, setOpen] = useState(false);
   const pathname = usePathname(); // Grabs the current URL (e.g., /dashboard/workspace-123/home)
+  const params = useParams();
+  const workspaceId = params.workspaceId as string;
 
   // Safely strips '/home' from the end of the URL to route directly to 'My Library'
-  const libraryUrl = pathname?.endsWith("/home") 
-    ? pathname.replace("/home", "") 
+  const libraryUrl = pathname?.endsWith("/home")
+    ? pathname.replace("/home", "")
     : pathname;
-
 
   return (
     <div className="flex flex-col gap-10 pb-10 max-w-6xl w-full">
-      
       {/* Hero Section */}
       <div className="relative overflow-hidden rounded-[2rem] border border-[#27272A] bg-gradient-to-br from-[#1A1A1D] via-[#121214] to-[#09090B] p-10 sm:p-14 shadow-2xl">
         <div className="absolute -top-32 -right-32 h-[500px] w-[500px] rounded-full bg-[#9D4EDD]/10 blur-[120px] pointer-events-none" />
@@ -59,12 +60,13 @@ const Home = () => {
           </h1>
 
           <p className="mt-6 text-lg text-zinc-400 max-w-xl leading-relaxed">
-            Stop typing long emails. Record your screen, share your ideas instantly, 
-            and let AI write the summary. Everything you need for seamless communication.
+            Stop typing long emails. Record your screen, share your ideas
+            instantly, and let AI write the summary. Everything you need for
+            seamless communication.
           </p>
 
           <div className="flex flex-wrap gap-4 mt-10">
-            <button 
+            <button
               onClick={() => setOpen(true)}
               className="bg-[#9D4EDD] hover:bg-[#7B2CBF] transition-all px-7 py-3.5 rounded-full text-white font-semibold flex items-center gap-2 shadow-lg shadow-[#9D4EDD]/20 hover:shadow-[#9D4EDD]/40"
             >
@@ -82,36 +84,46 @@ const Home = () => {
         </h2>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-          <div 
+          <div
             onClick={() => setOpen(true)}
             className="group bg-[#1A1A1D] border border-[#27272A] rounded-3xl p-7 hover:border-[#9D4EDD]/40 hover:bg-[#1A1A1D]/80 hover:-translate-y-1 transition-all duration-300 cursor-pointer shadow-sm hover:shadow-xl hover:shadow-[#9D4EDD]/5"
           >
             <div className="bg-[#27272A] w-12 h-12 rounded-2xl flex items-center justify-center mb-5 group-hover:bg-[#9D4EDD]/20 group-hover:scale-110 transition-all duration-300">
-              <Video className="text-zinc-300 group-hover:text-[#9D4EDD] transition-colors" size={24} />
+              <Video
+                className="text-zinc-300 group-hover:text-[#9D4EDD] transition-colors"
+                size={24}
+              />
             </div>
             <h3 className="text-zinc-100 font-semibold text-lg mb-2">
               New Recording
             </h3>
             <p className="text-zinc-400 text-sm leading-relaxed">
-              Capture your screen, camera, and microphone instantly with our lightweight desktop app.
+              Capture your screen, camera, and microphone instantly with our
+              lightweight desktop app.
             </p>
           </div>
 
           {/* Corrected Routing: Relies on the bulletproof libraryUrl calculation */}
-          <Link 
+          <Link
             href={libraryUrl}
             className="block group bg-[#1A1A1D] border border-[#27272A] rounded-3xl p-7 hover:border-[#9D4EDD]/40 hover:bg-[#1A1A1D]/80 hover:-translate-y-1 transition-all duration-300 cursor-pointer shadow-sm hover:shadow-xl hover:shadow-[#9D4EDD]/5"
           >
             <div className="bg-[#27272A] w-12 h-12 rounded-2xl flex items-center justify-center mb-5 group-hover:bg-[#9D4EDD]/20 group-hover:scale-110 transition-all duration-300">
-              <FolderOpen className="text-zinc-300 group-hover:text-[#9D4EDD] transition-colors" size={24} />
+              <FolderOpen
+                className="text-zinc-300 group-hover:text-[#9D4EDD] transition-colors"
+                size={24}
+              />
             </div>
             <h3 className="text-zinc-100 font-semibold text-lg mb-2">
               Create Folder
             </h3>
             <p className="text-zinc-400 text-sm leading-relaxed">
-              Keep your workspace clutter-free. Organize your videos by project, team, or topic.
+              Keep your workspace clutter-free. Organize your videos by project,
+              team, or topic.
             </p>
           </Link>
+
+          <WorkspaceMembersModal workspaceId={workspaceId} compact={true} />
         </div>
       </div>
 
@@ -122,34 +134,34 @@ const Home = () => {
         </h2>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-          <FeatureCard 
-            icon={<MonitorPlay size={20} />} 
-            title="HD Screen Recording" 
+          <FeatureCard
+            icon={<MonitorPlay size={20} />}
+            title="HD Screen Recording"
             desc="Crystal clear capture of your screen and camera."
           />
-          <FeatureCard 
-            icon={<Share2 size={20} />} 
-            title="Instant Sharing" 
+          <FeatureCard
+            icon={<Share2 size={20} />}
+            title="Instant Sharing"
             desc="Get a shareable link the second you stop recording."
           />
-          <FeatureCard 
-            icon={<Bot size={20} />} 
-            title="AI Summaries" 
+          <FeatureCard
+            icon={<Bot size={20} />}
+            title="AI Summaries"
             desc="Automatic transcripts and key takeaways."
           />
-          <FeatureCard 
-            icon={<LayoutGrid size={20} />} 
-            title="Smart Organization" 
+          <FeatureCard
+            icon={<LayoutGrid size={20} />}
+            title="Smart Organization"
             desc="Group your content into dedicated workspaces."
           />
-          <FeatureCard 
-            icon={<Users size={20} />} 
-            title="Team Collaboration" 
+          <FeatureCard
+            icon={<Users size={20} />}
+            title="Team Collaboration"
             desc="Leave comments and feedback on timestamps."
           />
-          <FeatureCard 
-            icon={<Activity size={20} />} 
-            title="Viewer Analytics" 
+          <FeatureCard
+            icon={<Activity size={20} />}
+            title="Viewer Analytics"
             desc="See exactly who watched your video and for how long."
           />
         </div>
@@ -165,7 +177,8 @@ const Home = () => {
             Great communication scales great teams.
           </h3>
           <p className="text-zinc-400 text-sm">
-            Record once, share everywhere, and keep everyone perfectly aligned without the extra meetings.
+            Record once, share everywhere, and keep everyone perfectly aligned
+            without the extra meetings.
           </p>
         </div>
       </div>
@@ -181,17 +194,21 @@ const Home = () => {
               Vync Desktop Required
             </DialogTitle>
             <DialogDescription className="text-zinc-400 text-[15px] leading-relaxed max-w-[90%] text-center mx-auto">
-              To capture your screen smoothly and securely, you'll need our dedicated desktop application.
+              To capture your screen smoothly and securely, you'll need our
+              dedicated desktop application.
             </DialogDescription>
           </DialogHeader>
 
           <div className="flex flex-col gap-4 mt-2">
             <div className="bg-[#1A1A1D] border border-[#27272A] p-4 rounded-xl text-sm text-zinc-400 leading-relaxed text-center">
-              <span className="font-medium text-zinc-200 block mb-1">Already installed?</span> 
-              Launch Vync directly from your computer's Start Menu to begin recording.
+              <span className="font-medium text-zinc-200 block mb-1">
+                Already installed?
+              </span>
+              Launch Vync directly from your computer's Start Menu to begin
+              recording.
             </div>
-            
-            <Button 
+
+            <Button
               onClick={downloadLatestDesktopApp}
               className="bg-zinc-100 hover:bg-zinc-200 text-zinc-950 w-full rounded-full h-11 text-[15px] font-semibold transition-all"
             >
@@ -200,17 +217,22 @@ const Home = () => {
           </div>
         </DialogContent>
       </Dialog>
-
     </div>
   );
 };
 
 // Reusable mini-component for the features to keep the code clean
-const FeatureCard = ({ icon, title, desc }: { icon: React.ReactNode, title: string, desc: string }) => (
+const FeatureCard = ({
+  icon,
+  title,
+  desc,
+}: {
+  icon: React.ReactNode;
+  title: string;
+  desc: string;
+}) => (
   <div className="flex items-start gap-4 bg-[#1A1A1D] border border-[#27272A] p-5 rounded-2xl">
-    <div className="p-2.5 bg-[#27272A] rounded-xl text-zinc-300">
-      {icon}
-    </div>
+    <div className="p-2.5 bg-[#27272A] rounded-xl text-zinc-300">{icon}</div>
     <div>
       <h4 className="text-zinc-200 font-medium text-[15px] mb-1">{title}</h4>
       <p className="text-zinc-500 text-sm leading-snug">{desc}</p>

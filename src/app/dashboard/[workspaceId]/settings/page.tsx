@@ -1,37 +1,37 @@
-'use client'
-import { enableFirstView, getFirstView, searchUsers } from '@/actions/user'
-import { DarkMode } from '@/components/theme/dark.mode'
-import { LightMode } from '@/components/theme/light-mode'
-import { SystemMode } from '@/components/theme/system-mode'
-import { Label } from '@/components/ui/label'
-import { Switch } from '@/components/ui/switch'
-import { cn } from '@/lib/utils'
-import { CheckCircle2 } from 'lucide-react'
-import { useTheme } from 'next-themes'
-import { useEffect, useState } from 'react'
-import { toast } from 'sonner'
+"use client";
+import { enableFirstView, getFirstView, searchUsers } from "@/actions/user";
+import { DarkMode } from "@/components/theme/dark.mode";
+import { LightMode } from "@/components/theme/light-mode";
+import { SystemMode } from "@/components/theme/system-mode";
+import { Label } from "@/components/ui/label";
+import { Switch } from "@/components/ui/switch";
+import { cn } from "@/lib/utils";
+import { CheckCircle2 } from "lucide-react";
+import { useTheme } from "next-themes";
+import { useEffect, useState } from "react";
+import { toast } from "sonner";
 
 const SettingsPage = () => {
-  const [firstView, setFirstView] = useState<undefined | boolean>(undefined)
-  const { setTheme, theme } = useTheme()
+  const [firstView, setFirstView] = useState<undefined | boolean>(undefined);
+  const { setTheme, theme } = useTheme();
 
   useEffect(() => {
-    if (firstView !== undefined) return
+    if (firstView !== undefined) return;
     const fetchData = async () => {
-      const response = await getFirstView()
-      if (response.status === 200) setFirstView(response?.data)
-    }
-    fetchData()
-  }, [firstView])
+      const response = await getFirstView();
+      if (response.status === 200) setFirstView(response?.data);
+    };
+    fetchData();
+  }, [firstView]);
 
   const switchState = async (checked: boolean) => {
-    const view = await enableFirstView(checked)
+    const view = await enableFirstView(checked);
     if (view) {
-      toast(view.status === 200 ? 'Success' : 'Failed', {
+      toast(view.status === 200 ? "Success" : "Failed", {
         description: view.data,
-      })
+      });
     }
-  }
+  };
 
   return (
     <div>
@@ -39,28 +39,28 @@ const SettingsPage = () => {
         <div className="lg:col-span-4 flex lg:flex-row flex-col items-start gap-5">
           <div
             className={cn(
-              'rounded-2xl overflow-hidden cursor-pointer border-4 border-transparent',
-              theme == 'system' && 'border-purple-800'
+              "rounded-2xl overflow-hidden cursor-pointer border-4 border-transparent",
+              theme == "system" && "border-purple-800",
             )}
-            onClick={() => setTheme('system')}
+            onClick={() => setTheme("system")}
           >
             <SystemMode />
           </div>
           <div
             className={cn(
-              'rounded-2xl overflow-hidden cursor-pointer border-4 border-transparent',
-              theme == 'light' && 'border-purple-800'
+              "rounded-2xl overflow-hidden cursor-pointer border-4 border-transparent",
+              theme == "light" && "border-purple-800",
             )}
-            onClick={() => setTheme('light')}
+            onClick={() => setTheme("light")}
           >
             <LightMode />
           </div>
           <div
             className={cn(
-              'rounded-2xl overflow-hidden cursor-pointer border-4 border-transparent',
-              theme == 'dark' && 'border-purple-800'
+              "rounded-2xl overflow-hidden cursor-pointer border-4 border-transparent",
+              theme == "dark" && "border-purple-800",
             )}
-            onClick={() => setTheme('dark')}
+            onClick={() => setTheme("dark")}
           >
             <DarkMode />
           </div>
@@ -82,7 +82,7 @@ const SettingsPage = () => {
         />
       </Label>
     </div>
-  )
-}
+  );
+};
 
-export default SettingsPage
+export default SettingsPage;

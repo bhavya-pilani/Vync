@@ -620,3 +620,114 @@ export const howToPost = async () => {
     return { status: 400 };
   }
 };
+
+export const getWorkspaceMembers = async (workspaceId: string) => {
+  try {
+    const user = await currentUser();
+    if (!user) return { status: 403, data: [] };
+
+    // Verify the current user has access to this workspace
+    const hasAccess = await client.workSpace.findUnique({
+      where: {
+        id: workspaceId,
+        OR: [
+          {
+            User: {
+              clerkid: user.id,
+            },
+          },
+          {
+            members: {
+              some: {
+                User: {
+                  clerkid: user.id,
+                },
+              },
+            },
+          },
+        ],
+      },
+    });
+
+    if (!hasAccess) {
+      return { status: 403, data: [] };
+    }
+
+    // Fetch all members of the workspace
+    const members = await client.member.findMany({
+      where: {
+        workSpaceId: workspaceId,
+      },
+      select: {
+        id: true,
+        createdAt: true,
+        User: {
+          select: {
+            id: true,
+            email: true,
+            firstname: true,
+            lastname: true,
+            image: true,
+          },
+        },
+      },
+      orderBy: {
+        createdAt: "asc",
+      },
+    });
+
+    // Also get the workspace owner
+    const workspaceOwner = await client.workSpace.findUnique({
+      where: {
+        id: workspaceId,
+      },
+      select: {
+        User: {
+          select: {
+            id: true,
+            email: true,
+            firstname: true,
+            lastname: true,
+            image: true,
+          },
+        },
+      },
+    });
+
+    const allMembers = [];
+    const addedUserIds = new Set<string>();
+
+    // Add workspace owner
+    if (workspaceOwner?.User) {
+      allMembers.push({
+        id: workspaceOwner.User.id,
+        email: workspaceOwner.User.email,
+        firstname: workspaceOwner.User.firstname,
+        lastname: workspaceOwner.User.lastname,
+        image: workspaceOwner.User.image,
+        isOwner: true,
+      });
+      addedUserIds.add(workspaceOwner.User.id);
+    }
+
+    // Add invited members (skip if already added as owner)
+    members.forEach((member) => {
+      if (member.User && !addedUserIds.has(member.User.id)) {
+        allMembers.push({
+          id: member.User.id,
+          email: member.User.email,
+          firstname: member.User.firstname,
+          lastname: member.User.lastname,
+          image: member.User.image,
+          isOwner: false,
+        });
+        addedUserIds.add(member.User.id);
+      }
+    });
+
+    return { status: 200, data: allMembers };
+  } catch (error) {
+    console.error("Error fetching workspace members:", error);
+    return { status: 500, data: [] };
+  }
+};
