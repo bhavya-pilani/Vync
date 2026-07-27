@@ -607,6 +607,132 @@ export const deleteVideo = async (videoId: string) => {
   }
 };
 
+export const deleteFolder = async (folderId: string) => {
+  try {
+    const user = await currentUser();
+    if (!user) return { status: 403, data: "Unauthorized" };
+
+    // Get the folder with workspace info
+    const folder = await client.folder.findUnique({
+      where: {
+        id: folderId,
+      },
+      select: {
+        workSpaceId: true,
+        WorkSpace: {
+          select: {
+            User: {
+              select: {
+                clerkid: true,
+              },
+            },
+            members: {
+              select: {
+                User: {
+                  select: {
+                    clerkid: true,
+                  },
+                },
+              },
+            },
+          },
+        },
+      },
+    });
+
+    if (!folder) {
+      return { status: 404, data: "Folder not found" };
+    }
+
+    // Check if user has permission (is workspace owner or member)
+    const isOwner = folder.WorkSpace?.User?.clerkid === user.id;
+    const isMember = folder.WorkSpace?.members.some(
+      (member) => member.User?.clerkid === user.id,
+    );
+
+    if (!isOwner && !isMember) {
+      return {
+        status: 403,
+        data: "You don't have permission to delete this folder",
+      };
+    }
+
+    // Get all videos in the folder
+    const videos = await client.video.findMany({
+      where: {
+        folderId,
+      },
+      select: {
+        id: true,
+        source: true,
+      },
+    });
+
+    // Delete each video from Cloudinary and database
+    for (const video of videos) {
+      try {
+        if (video.source) {
+          let publicId: string | null = null;
+
+          try {
+            const url = new URL(video.source);
+            const pathname = url.pathname;
+            const uploadMatch = pathname.match(/\/video\/upload\/(.+)$/);
+            if (uploadMatch) {
+              let idPath = uploadMatch[1];
+              idPath = idPath.split("?")[0];
+              idPath = idPath.replace(/^v\d+\//, "");
+              publicId = idPath.replace(/\.[^.]+$/, "");
+            }
+          } catch (e) {
+            console.log("⚠️ URL parsing failed:", e);
+          }
+
+          if (publicId) {
+            try {
+              await cloudinary.api.delete_resources([publicId], {
+                resource_type: "video",
+              });
+              console.log("✨ Video deleted from Cloudinary:", publicId);
+            } catch (cloudinaryError) {
+              console.error(
+                "❌ Error deleting from Cloudinary:",
+                cloudinaryError,
+              );
+              // Continue with database deletion even if Cloudinary deletion fails
+            }
+          }
+        }
+
+        // Delete video from database
+        await client.video.delete({
+          where: {
+            id: video.id,
+          },
+        });
+      } catch (videoError) {
+        console.error("Error deleting video:", videoError);
+        // Continue deleting other videos
+      }
+    }
+
+    // Delete the folder from database
+    await client.folder.delete({
+      where: {
+        id: folderId,
+      },
+    });
+
+    return {
+      status: 200,
+      data: "Folder and all videos deleted successfully",
+    };
+  } catch (error) {
+    console.error("Delete folder error:", error);
+    return { status: 500, data: "Failed to delete folder" };
+  }
+};
+
 export const howToPost = async () => {
   try {
     const response = await axios.get(process.env.CLOUD_WAYS_POST as string);
