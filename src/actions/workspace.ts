@@ -811,6 +811,7 @@ export const getWorkspaceMembers = async (workspaceId: string) => {
         User: {
           select: {
             id: true,
+            clerkid: true,
             email: true,
             firstname: true,
             lastname: true,
@@ -840,7 +841,7 @@ export const getWorkspaceMembers = async (workspaceId: string) => {
     members.forEach((member) => {
       if (member.User && !addedUserIds.has(member.User.id)) {
         allMembers.push({
-          id: member.User.id,
+          id: member.id,
           email: member.User.email,
           firstname: member.User.firstname,
           lastname: member.User.lastname,
@@ -851,9 +852,82 @@ export const getWorkspaceMembers = async (workspaceId: string) => {
       }
     });
 
-    return { status: 200, data: allMembers };
+    // Check if current user is the owner
+    const isCurrentUserOwner = workspaceOwner?.User?.clerkid === user.id;
+
+    return {
+      status: 200,
+      data: allMembers,
+      isOwner: isCurrentUserOwner,
+    };
   } catch (error) {
     console.error("Error fetching workspace members:", error);
-    return { status: 500, data: [] };
+    return { status: 500, data: [], isOwner: false };
+  }
+};
+
+export const removeMember = async (workspaceId: string, memberId: string) => {
+  try {
+    const user = await currentUser();
+    if (!user) return { status: 403, data: "Unauthorized" };
+
+    // Get workspace to check if current user is owner
+    const workspace = await client.workSpace.findUnique({
+      where: {
+        id: workspaceId,
+      },
+      select: {
+        User: {
+          select: {
+            clerkid: true,
+          },
+        },
+      },
+    });
+
+    if (!workspace) {
+      return { status: 404, data: "Workspace not found" };
+    }
+
+    // Check if current user is the workspace owner
+    if (workspace.User?.clerkid !== user.id) {
+      return { status: 403, data: "Only workspace owner can remove members" };
+    }
+
+    // Check if the member to remove exists in this workspace
+    const member = await client.member.findFirst({
+      where: {
+        id: memberId,
+        workSpaceId: workspaceId,
+      },
+      select: {
+        User: {
+          select: {
+            clerkid: true,
+          },
+        },
+      },
+    });
+
+    if (!member) {
+      return { status: 404, data: "Member not found in workspace" };
+    }
+
+    // Prevent removing the owner (though owner should not be in members table)
+    if (member.User?.clerkid === user.id) {
+      return { status: 400, data: "Cannot remove yourself from the workspace" };
+    }
+
+    // Delete the member
+    await client.member.delete({
+      where: {
+        id: memberId,
+      },
+    });
+
+    return { status: 200, data: "Member removed successfully" };
+  } catch (error) {
+    console.error("Error removing member:", error);
+    return { status: 500, data: "Failed to remove member" };
   }
 };
